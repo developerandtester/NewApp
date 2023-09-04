@@ -1,0 +1,17 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <section class="container">
+        <h1>Add a New Task</h1>
+        <form action="{{ url_for('add_task') }}" method="post">
+            <label for="task">Task:</label>
+            <input type="text" id="task" name="task" required><br>
+            <label for="time">Time (HH:MM):</label>
+            <input type="text" id="time" name="time" class="flatpickr" required><br>
+            <label for="priority">Priority (1-5):</label>
+            <input type="number" id="priority" name="priority" min="1" max="5" required><br>
+            <button type="submit">Add Task</button>
+        </form>
+        <p><a href="{{ url_for('index') }}">Back to Tasks</a></p>
+    </section>
+{% endblock %}

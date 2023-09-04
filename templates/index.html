@@ -1,0 +1,24 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <section class="container">
+        <h1>Welcome to Your Reminder App!</h1>
+        <p>Here are your tasks:</p>
+        <ul>
+            {% for task in tasks %}
+            <li>
+                Task: {{ task['task'] }}<br>
+                Time: {{ task['time'] }}<br>
+                Priority: {{ task['priority'] }}<br>
+                {% if task['reminder'] %}
+                    Reminder: Done
+                {% else %}
+                    <form action="{{ url_for('mark_done', task_index=loop.index0) }}" method="post">
+                        <button type="submit">Mark Done</button>
+                    </form>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+    </section>
+{% endblock %}
