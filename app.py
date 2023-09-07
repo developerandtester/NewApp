@@ -1,7 +1,25 @@
 import datetime
 from flask import Flask, render_template, request, redirect, url_for
+from flask_socketio import SocketIO, join_room, leave_room, send
+import mysql.connector
+from flask_httpauth import HTTPBasicAuth
+import pandas as pd
+import json
+import http.client
+
 
 app = Flask(__name__)
+app.config["SECRET_KEY"] = "supersecretkey"
+socketio = SocketIO(app)
+
+mydb = mysql.connector.connect(
+  host="eu-cdbr-west-03.cleardb.net",
+  user="bd5b45754d9419",
+  password="cfd3aeb8",
+  database="heroku_f7fc2d46da75047"
+)
+
+
 
 class Reminder:
     def __init__(self):
