@@ -1,7 +1,8 @@
 import datetime
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for,session,jsonify
 from flask_socketio import SocketIO, join_room, leave_room, send
 import mysql.connector
+import hashlib
 from flask_httpauth import HTTPBasicAuth
 import pandas as pd
 import http.client
@@ -109,94 +110,12 @@ def check_user_existence(username):
     return False
 
 # insert user data into the database
-def insert_user_data(data):
-    mydb.reconnect()
-    cursor = mydb.cursor()
-    query = "INSERT INTO tbl_users (userPass, userFirstName, userLastName, userName, userDefaultAddr, userPhone, userAccess,userEIRcode) VALUES (%s, %s, %s, %s, %s, %s, %s,%s)"
-    cursor.execute(query, (data['userPass'], data['userFirstName'], data['userLastName'], data['userName'], data['userDefaultAddr'], data['userPhone'], 2,data['userEirCode']))
-    mydb.commit()
+
 
 # Flask route to handle the signup form
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():    
    return render_template('signup.html')
-
-@app.route("/addUser", methods=['GET','POST'])
-def addUser():
-    if request.method == 'POST':
-        # get form data
-        input = request.get_json()
-        userPass = input['userPass']
-        userFirstName = input['userFirstName']
-        userLastName = input['userLastName']
-        userName = input['userName']
-        userDefaultAddr = input['userDefaultAddr']
-        userPhone = input['userPhone']
-        userEirCode=input['eircode']
-        
-        userPass=str(hashlib.md5(userPass.encode("utf-8")).hexdigest())
-        # check for SQL injection
-        if check_sql_injection(userPass) or check_sql_injection(userFirstName) or check_sql_injection(userLastName) or check_sql_injection(userName) or check_sql_injection(userDefaultAddr) or check_sql_injection(userPhone):
-            return jsonify({'Result':'Error: SQL injection detected!'})
-        
-        # check for user existence
-        if check_user_existence(userName):
-
-            return jsonify({'Result': 'User already exists!'})
-        
-        # insert user data into the database
-        data = {
-            'userPass': userPass,
-            'userFirstName': userFirstName,
-            'userLastName': userLastName,
-            'userName': userName,
-            'userDefaultAddr': userDefaultAddr,
-            'userPhone': userPhone,
-            'userEirCode':userEirCode
-        }
-        insert_user_data(data)
-        mydb.reconnect()
-        cursor = mydb.cursor()
-        query = "SELECT * FROM tbl_users WHERE userName = %s"
-        cursor.execute(query, (userName,))
-        data2 = cursor.fetchall()
-        session['is_logged_in'] = True
-        session['userPass'] = userPass
-        session['userFirstName'] = userFirstName
-        session['userLastName'] = userLastName
-        session['userName'] = userName
-        session['userID'] = data2[0][0]
-        session['userDefaultAddr'] = userDefaultAddr
-        session['userPhone'] = userPhone
-        session['userEirCode'] = userEirCode
-        return jsonify({'Result': 'User added successfully!'})
- 
-@app.route("/verifyUser", methods = ['GET',"POST"])
-def verifyUser():
-    if request.method == 'POST':
-        data = request.get_json()
-        user = data['Username']
-        password = data['Password']
-        hashpassword = hashlib.md5(password.encode("utf-8")).hexdigest()
-        mydb.reconnect()
-        cursor = mydb.cursor()
-        cursor.execute('SELECT * FROM tbl_users WHERE userName = %s AND userPass = %s', (user, str(hashpassword)))
-        data2 = cursor.fetchall()
-        cursor.close()                        
-        if len(data2) > 0:   
-            session['userID']=data2[0][0]
-            session['userFirstName'] = data2[0][2]
-            session['userLastName'] = data2[0][3]
-            session['userName'] = data2[0][4]
-            session['userDefaultAddr'] = data2[0][5]
-            session['userPhone'] = data2[0][6]
-            session['userEirCode'] = data2[0][8]
-            session['user'] = str(data2[0][3])
-            session['is_logged_in'] = True
-            session['useraccess'] = data2[0][7]
-            return jsonify({'Result': '1'})
-        return jsonify({'error' : 'Missing data!'})
-
 
 @app.route('/add_task', methods=['GET', 'POST'])
 def add_task():
