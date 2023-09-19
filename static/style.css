@@ -129,3 +129,59 @@ form {
     margin-bottom: 10px;
     box-sizing: border-box;
   }
+
+  .chat-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    text-align: center;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+/* Chat interface style */
+.chat-interface {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 300px;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    display: none;
+    z-index: 999; /* Ensure the chat is displayed on top of content */
+}
+
+/* Chat messages style */
+.chat-messages {
+    max-height: 200px;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+/* User message style */
+.user-message {
+    background-color: #007BFF;
+    color: white;
+    padding: 5px;
+    margin: 5px;
+    border-radius: 5px;
+    max-width: 70%;
+    word-wrap: break-word;
+}
+
+/* AI response style */
+.ai-message {
+    background-color: #eee;
+    padding: 5px;
+    margin: 5px;
+    border-radius: 5px;
+    max-width: 70%;
+    word-wrap: break-word;
+}
