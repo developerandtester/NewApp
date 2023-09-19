@@ -20,9 +20,64 @@
             </li>
             {% endfor %}
         </ul>
-        <div class="floating-button-div">
-            <button class="fb"><svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M64 0C28.7 0 0 28.7 0 64V352c0 35.3 28.7 64 64 64h96v80c0 6.1 3.4 11.6 8.8 14.3s11.9 2.1 16.8-1.5L309.3 416H448c35.3 0 64-28.7 64-64V64c0-35.3-28.7-64-64-64H64z"/></svg></button>
-          </div>
+        <!-- Chat bubble floating button -->
+    <div id="chat-button" class="chat-button" onclick="toggleChat()">Chat</div>
+
+    <!-- Chat interface -->
+    <div id="chat-interface" class="chat-interface">
+        <div id="chat-messages" class="chat-messages">
+            <!-- Chat messages will be displayed here -->
+        </div>
+        <input id="user-input" type="text" placeholder="Type your message..." onkeyup="sendMessage(event)">
+    </div>
           
     </section>
+    <script>
+        // JavaScript code for toggling the chat interface
+        function toggleChat() {
+            var chatInterface = document.getElementById("chat-interface");
+            chatInterface.style.display = chatInterface.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // JavaScript code for sending user messages
+        function sendMessage(event) {
+            if (event.key === "Enter") {
+                var userInput = document.getElementById("user-input");
+                var userMessage = userInput.value;
+                displayUserMessage(userMessage);
+                userInput.value = "";
+
+                // Send user message to the server for processing
+                sendUserMessageToServer(userMessage);
+            }
+        }
+
+        // JavaScript code for displaying user messages
+        function displayUserMessage(message) {
+            var chatMessages = document.getElementById("chat-messages");
+            chatMessages.innerHTML += '<div class="user-message">' + message + '</div>';
+        }
+
+        // JavaScript code for displaying AI responses
+        function displayAIResponse(response) {
+            var chatMessages = document.getElementById("chat-messages");
+            chatMessages.innerHTML += '<div class="ai-message">' + response + '</div>';
+        }
+
+        // JavaScript code for sending user message to the server
+        function sendUserMessageToServer(message) {
+            fetch('/ask', {
+                method: 'POST',
+                body: JSON.stringify({ message: message }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                displayAIResponse(data.response);
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
 {% endblock %}

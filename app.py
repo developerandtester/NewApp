@@ -7,15 +7,15 @@ from flask_login import LoginManager, UserMixin, login_user, logout_user, login_
 import openai
 import os
 
-openai.api_key = os.getenv("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")
+openai.api_key = "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"
 
-app = Flask(__name__)
+app = Flask(__name__,template_folder='templates')
 app.config["SECRET_KEY"] = "supersecretkey"
 app.config['SESSION_TYPE'] = 'filesystem'  # You can choose other session storage options
 Session(app)
-login_manager = LoginManager()
-login_manager.login_view = 'login'  # Specify the login view
-login_manager.init_app(app)
+# login_manager = LoginManager()
+# login_manager.login_view = 'login'  # Specify the login view
+# login_manager.init_app(app)
 
 
 mydb = mysql.connector.connect(
@@ -76,6 +76,22 @@ class Reminder:
 
 reminder_app = Reminder()
 
+
+@app.route('/')
+@app.route('/index')
+def index():
+    if request.method == 'POST':
+        task = request.form['task']
+        time = request.form['time']
+        priority = int(request.form['priority'])
+        reminder_app.add_task(task, time, priority)
+
+    reminder_app.run_reminder()
+    if('is_logged_in' not in session):
+        session['is_logged_in']=False
+    else:
+        session['is_logged_in']=True
+    return render_template('index.html', tasks=reminder_app.tasks)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -168,23 +184,7 @@ def get_user_id(username):
         return result[0]  # Return the user ID
     return None
 
-@app.route('/')
-@app.route('/index')
-@login_required
-def index():
-    if request.method == 'POST':
-        task = request.form['task']
-        time = request.form['time']
-        priority = int(request.form['priority'])
-        reminder_app.add_task(task, time, priority)
 
-    reminder_app.run_reminder()
-    if('is_logged_in' not in session):
-        session['is_logged_in']=False
-    else:
-        session['is_logged_in']=True
-    return render_template('index.html', tasks=reminder_app.tasks)
-  
 @app.route("/logout",methods = ['GET',"POST"])
 def logout():    
     session.clear()
@@ -215,14 +215,26 @@ def mark_done(task_index):
 
 #code for openAI API to get response as a chatbot
 def getOpenAIresponse(prompt:str):
-    response=openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=[
-            {'role':'user','text':prompt}
-        ],
-        temperature=0.4,
-        token="1500")
-    return response["choices"][0]["message"]["content"]
+    conversation = [
+        {'role': 'system', 'content': 'You are a helpful assistant.'},
+        {'role': 'user', 'content': prompt}
+    ]
+    print(conversation)
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo-0613",
+        messages=conversation
+    )
+    return response['choices'][0]['message']['content']
+
+@app.route('/ask', methods=['POST'])
+def ask():
+    data = request.get_json()
+    user_message = data['message']
+    # Call the getOpenAIresponse function to get an AI response
+    ai_response = getOpenAIresponse(user_message)
+    response_data = {'response': ai_response}
+    return jsonify(response_data), 200, {'Content-Type': 'application/json'}
+
 
 if __name__ == '__main__':
     app.run(debug=True)
