@@ -1,0 +1,65 @@
+{% extends 'layout.html' %}
+{% block content %}
+<h1>Sign Up</h1>
+
+  <label for="userFirstName">First Name:</label>
+  <input type="text" id="userFirstName" name="userFirstName">
+
+  <label for="userName">Email (Will be used for future login):</label>
+  <input type="text" id="userName" name="userName">
+
+  <label for="userPass">Password:</label>
+  <input type="password" id="userPass" name="userPass">
+
+  <button value="SignUp" onclick="validateForm()">SignUp</button>
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script>
+    function isValidEmail(email) {
+        // Regular expression for email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    
+        return emailRegex.test(email);
+      }
+    function addUser{
+        const userName= document.getElementById('userName').value; 
+        const userFirstName= document.getElementById('userFirstName').value;          
+        const userPass= document.getElementById('userPass').value; 
+        var u ={
+            userName:userName,
+            userFirstName:userFirstName,
+            userPass:userPass         
+          }
+        if (!isValidEmail(userName)) {
+            alert('Invalid Email ID!');
+            return false;
+        }
+        $.ajax({
+            url: "/addUser",
+            type: "POST",
+            data: JSON.stringify(u),
+            contentType: "application/json",
+            dataType: 'json',
+            success: function(result) {
+              if(result.Result=="Error: SQL injection detected!"){
+                alert('Error: SQL injection detected!')
+                return false;
+              }
+              else if(result.Result=="User already exists!"){
+                alert('User Already Exists!!!')
+                return false;
+              }
+              else if(result.Result=="User added successfully!"){
+                alert('User Created Successfully!!!')
+                window.location.href='/cart';      
+              }                                   
+            },
+            error: function (errorMeesage) {
+              console.log(errorMeesage);
+            }
+          });          
+          return true;
+        }
+</script>
+{% endblock %}
+  

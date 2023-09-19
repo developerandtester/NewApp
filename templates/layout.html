@@ -7,6 +7,17 @@
     <!-- Add this in the <head> section of your HTML -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.3/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script>
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  OneSignalDeferred.push(function(OneSignal) {
+    OneSignal.init({
+      appId: "1fa616c6-63ba-4a69-af70-28e92e4da8c4",
+      allowLocalhostAsSecureOrigin: true,
+    });
+  });
+</script>
 
 </head>
 <body>
@@ -14,6 +25,12 @@
         <ul>
             <li><a href="{{ url_for('index') }}">Home</a></li>
             <li><a href="{{ url_for('add_task') }}">Add Task</a></li>       
+            {% if session['is_logged_in'] is true %}
+            <li><a href="/logout">Logout</a></li>
+            {%else%}
+            <li><a href="/login">Login</a></li>
+            <li><a href="/signup">Register</a></li>
+            {%endif%}
         </ul>
     </nav>
     

@@ -1,22 +1,28 @@
 import datetime
 from flask import Flask, render_template, request, redirect, url_for,session,jsonify
-from flask_socketio import SocketIO, join_room, leave_room, send
 import mysql.connector
 import hashlib
-from flask_httpauth import HTTPBasicAuth
-import pandas as pd
-import http.client
+from flask_session import Session
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required
+import openai
+import os
 
+openai.api_key = os.getenv("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")
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "supersecretkey"
-socketio = SocketIO(app)
+app.config['SESSION_TYPE'] = 'filesystem'  # You can choose other session storage options
+Session(app)
+login_manager = LoginManager()
+login_manager.login_view = 'login'  # Specify the login view
+login_manager.init_app(app)
+
 
 mydb = mysql.connector.connect(
-  host="eu-cdbr-west-03.cleardb.net",
-  user="bd5b45754d9419",
-  password="cfd3aeb8",
-  database="heroku_f7fc2d46da75047"
+  host="127.0.0.1",
+  user="root",
+  password="rootroot",
+  database="db_nudgeprompt"
 )
 
 cursor = mydb.cursor()
@@ -54,10 +60,10 @@ class Reminder:
             self.tasks[task_index]['reminder'] = True
     
     def add_task_to_db(self, user_id, task_desc, task_time, task_priority=1):
-        # SQL statement to insert a new task
+    # SQL statement to insert a new task
         sql = "INSERT INTO tbl_tasks (task_usr_id, task_desc, task_reminder_time, task_priority) VALUES (%s, %s, %s, %s)"
         values = (user_id, task_desc, task_time, task_priority)
-        # Execute the SQL statement
+    # Execute the SQL statement
         cursor.execute(sql, values)
         mydb.commit()
     
@@ -70,7 +76,101 @@ class Reminder:
 
 reminder_app = Reminder()
 
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        
+        # Retrieve the user's hashed password from the database
+        hashed_password = get_user_password(username)  # Implement this function
+        
+        # Compare the provided password with the hashed password
+        if hashed_password and verify_password(password, hashed_password):
+            # Successful login
+            session['is_logged_in'] = True
+            session['username'] = username
+            return redirect(url_for('index'))
+        else:
+            return "Invalid username or password. Please try again."
+    
+    return render_template('login.html')
+     
+def get_user_password(username):
+    # SQL statement to retrieve the hashed password for the given username
+    sql = "SELECT usr_pass FROM tbl_users WHERE usr_nm = %s"
+    cursor.execute(sql, (username,))
+    result = cursor.fetchone()
+    if result:
+        return result[0]  # Return the hashed password
+    return None
+
+def verify_password(provided_password, hashed_password):
+    # Hash the provided password and compare it with the stored hashed password
+    provided_hashed = hashlib.sha256(provided_password.encode()).hexdigest()
+    return provided_hashed == hashed_password
+
+
+@app.route('/signup', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        # Add code to validate and hash the password (e.g., using hashlib)
+        
+        # Check if the username is already taken
+        if check_user_existence(username):
+            return "Username already exists. Please choose a different one."
+        
+        # Insert the new user into the database
+        insert_user_into_db(username, password)  # Implement this function
+        
+        # Redirect the user to the login page
+        return redirect(url_for('login'))
+    
+    return render_template('signup.html')
+
+def insert_user_into_db(username, password):
+    # Hash the password (e.g., using hashlib)
+    hashed_password = hashlib.sha256(password.encode()).hexdigest()
+    
+    # SQL statement to insert a new user
+    sql = "INSERT INTO tbl_users (usr_nm, usr_pass) VALUES (%s, %s)"
+    values = (username, hashed_password)
+    
+    # Execute the SQL statement
+    cursor.execute(sql, values)
+    mydb.commit()
+
+@app.route('/add_task', methods=['GET', 'POST'])
+@login_required
+def add_task():
+    if not session.get('is_logged_in'):
+        return redirect(url_for('login'))  # Redirect unauthenticated users to login
+
+    if request.method == 'POST':
+        task = request.form['task']
+        time = request.form['time']
+        priority = int(request.form['priority'])
+        user_id = get_user_id(session['username'])  # Implement this function
+        reminder_app.add_task_to_db(user_id, task, time, priority)
+        return redirect(url_for('index'))
+
+    return render_template('add_task.html')
+
+def get_user_id(username):
+    # SQL statement to retrieve the user ID for the given username
+    sql = "SELECT usr_id FROM tbl_users WHERE usr_nm = %s"
+    cursor.execute(sql, (username,))
+    result = cursor.fetchone()
+    if result:
+        return result[0]  # Return the user ID
+    return None
+
 @app.route('/')
+@app.route('/index')
+@login_required
 def index():
     if request.method == 'POST':
         task = request.form['task']
@@ -79,12 +179,11 @@ def index():
         reminder_app.add_task(task, time, priority)
 
     reminder_app.run_reminder()
+    if('is_logged_in' not in session):
+        session['is_logged_in']=False
+    else:
+        session['is_logged_in']=True
     return render_template('index.html', tasks=reminder_app.tasks)
-
-@app.route("/login",methods = ['GET',"POST"])
-def login():
-     return render_template('/login.html')
- 
   
 @app.route("/logout",methods = ['GET',"POST"])
 def logout():    
@@ -109,29 +208,21 @@ def check_user_existence(username):
         return True
     return False
 
-# insert user data into the database
-
-
-# Flask route to handle the signup form
-@app.route('/signup', methods=['GET', 'POST'])
-def signup():    
-   return render_template('signup.html')
-
-@app.route('/add_task', methods=['GET', 'POST'])
-def add_task():
-    if request.method == 'POST':
-        task = request.form['task']
-        time = request.form['time']
-        priority = int(request.form['priority'])
-        reminder_app.add_task(task, time, priority)
-        return redirect(url_for('index'))
-
-    return render_template('add_task.html')
- 
 @app.route('/mark_done/<int:task_index>', methods=['POST'])
 def mark_done(task_index):
     reminder_app.mark_task_done(task_index)
     return redirect(url_for('index'))
+
+#code for openAI API to get response as a chatbot
+def getOpenAIresponse(prompt:str):
+    response=openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {'role':'user','text':prompt}
+        ],
+        temperature=0.4,
+        token="1500")
+    return response["choices"][0]["message"]["content"]
 
 if __name__ == '__main__':
     app.run(debug=True)

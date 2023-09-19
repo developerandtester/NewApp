@@ -1,0 +1,46 @@
+{% extends 'layout.html' %}
+{% block content %}
+<h1>Login</h1>
+
+    <form method="post">
+        <input type="text" class="form-control" placeholder="Username" id="txtUser" name="username" value="">
+         <input type="password" class="form-control" placeholder="Password" id="txtPass" name="password" value="">
+        <button onclick="login()">Login</button>
+      </form>
+      
+        <div class="container">
+        <br>
+       <p>No account? <a href='/signup'>Register here</a>.</p>
+       <br>
+        
+      </div>
+      <div>
+        {{form}}
+      </div>
+      <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+      <script>
+        function login(){
+          var u = {
+            Username: $('#txtUser').val(),
+            Password: $('#txtPass').val()
+        };
+        $.ajax({
+          url: "/verifyUser",
+          type: "POST",
+          data: JSON.stringify(u),
+          contentType: "application/json",
+          dataType: 'json',
+          success: function(result) {
+            console.log(result);
+            if(result.Result == '1'){
+              alert("Login successful!");
+              window.location.href = "/";
+            }
+          },
+          error: function(result) {
+            alert("Login failed!");
+          }
+        });                  
+        }
+      </script>
+{% endblock %}
