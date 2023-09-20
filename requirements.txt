@@ -15,6 +15,7 @@ Flask-Login==0.6.2
 Flask-Session==0.5.0
 Flask-SocketIO==5.3.6
 frozenlist==1.4.0
+gunicorn==21.2.0
 idna==3.4
 itsdangerous==2.1.2
 Jinja2==3.1.2
@@ -23,6 +24,7 @@ multidict==6.0.4
 mysql-connector-python==8.1.0
 numpy==1.25.2
 openai==0.28.0
+packaging==23.1
 pandas==2.1.0
 protobuf==4.21.12
 pydub==0.25.1
