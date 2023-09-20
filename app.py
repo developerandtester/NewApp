@@ -19,10 +19,11 @@ Session(app)
 
 
 mydb = mysql.connector.connect(
-  host="127.0.0.1",
-  user="root",
-  password="rootroot",
-  database="db_nudgeprompt"
+  host="ulsq0qqx999wqz84.chr7pe7iynqr.eu-west-1.rds.amazonaws.com",
+  user="yh1rouqsuxxqdgbs",
+  password="okn19h5k93o3dcqf",
+  database="nyuufuvltab3cl9m",
+  port=3306
 )
 
 cursor = mydb.cursor()
