@@ -1,13 +1,26 @@
 import datetime
-from flask import Flask, render_template, request, redirect, url_for,session,jsonify
+from flask import Flask, render_template, request, redirect, url_for,session,jsonify,make_response, send_from_directory
 import mysql.connector
 import hashlib
 from flask_session import Session
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required
 import openai
 import os
+import onesignal
+from onesignal.api import default_api
+from onesignal.model.create_subscription_request_body import CreateSubscriptionRequestBody
 
-openai.api_key = "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"
+
+openai.api_key = "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"
+configuration = onesignal.Configuration(
+    # live
+    # appId: "1fa616c6-63ba-4a69-af70-28e92e4da8c4",
+    # localhost
+    # app_key:"fd8d5be2-d9c8-4c9d-b0ce-7f9a429e9248",
+    app_key = "1fa616c6-63ba-4a69-af70-28e92e4da8c4",
+    user_key = "NDFiNDMyMTItMTk0YS00YmZmLThmNjctMDFiNDU2NWUwMDll"
+)
+
 
 app = Flask(__name__,template_folder='templates')
 app.config["SECRET_KEY"] = "supersecretkey"
@@ -16,6 +29,10 @@ Session(app)
 # login_manager = LoginManager()
 # login_manager.login_view = 'login'  # Specify the login view
 # login_manager.init_app(app)
+
+with onesignal.ApiClient(configuration) as api_client:
+    # Create an instance of the API class
+    api_instance = default_api.DefaultApi(api_client)    
 
 
 mydb = mysql.connector.connect(
@@ -93,6 +110,14 @@ def index():
     else:
         session['is_logged_in']=True
     return render_template('index.html', tasks=reminder_app.tasks)
+
+@app.route('/OneSignalSDKWorker.js')
+def sw():
+    response=make_response(
+                     send_from_directory('/',filename='OneSignalSDKWorker.js'))
+    #change the content header file. Can also omit; flask will handle correctly.
+    response.headers['Content-Type'] = 'application/javascript'
+    return response
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():

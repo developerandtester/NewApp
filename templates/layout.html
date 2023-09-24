@@ -7,17 +7,21 @@
     <!-- Add this in the <head> section of your HTML -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.3/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
-    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-<script>
-  window.OneSignalDeferred = window.OneSignalDeferred || [];
-  OneSignalDeferred.push(function(OneSignal) {
-    OneSignal.init({
+    <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
+    <script>
+        window.OneSignal = window.OneSignal || [];
+        OneSignal.push(function () {
+            OneSignal.init({
+                 //live
       appId: "1fa616c6-63ba-4a69-af70-28e92e4da8c4",
-      allowLocalhostAsSecureOrigin: true,
-    });
-  });
-</script>
+      //locaclhost
+      //appId:"fd8d5be2-d9c8-4c9d-b0ce-7f9a429e9248",
+                notifyButton: {
+                    enable: true,
+                },
+            });
+        });
+    </script>
 
 </head>
 <body>
@@ -43,12 +47,11 @@
     </footer>
 </body>
 <script>
-    // Initialize flatpickr for the time input
 flatpickr("#time", {
     enableTime: true,
     noCalendar: true,
     dateFormat: "H:i",
-    time_24hr: true
+    time_24hr: false
 });
 var floatingButtonContainer = document.querySelector('.floating-button-div');
 var scrollY = window.scrollY;
@@ -56,5 +59,8 @@ window.addEventListener('scroll', function() {
   scrollY = window.scrollY;
   floatingButtonContainer.style.top = scrollY + window.innerHeight - 150 + 'px';
 });
+
+
 </script>
+
 </html>
