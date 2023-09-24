@@ -5,25 +5,9 @@ import hashlib
 from flask_session import Session
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required
 import openai
-import os
-import onesignal
-from onesignal.api import default_api
-from onesignal.model.create_subscription_request_body import CreateSubscriptionRequestBody
-from pywebpush import webpush, WebPushException
-import json
 
 
 openai.api_key = "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"
-configuration = onesignal.Configuration(
-    # live
-    # appId: "1fa616c6-63ba-4a69-af70-28e92e4da8c4",
-    # localhost
-    # app_key:"fd8d5be2-d9c8-4c9d-b0ce-7f9a429e9248",
-    app_key = "fd8d5be2-d9c8-4c9d-b0ce-7f9a429e9248",
-    user_key = "NDFiNDMyMTItMTk0YS00YmZmLThmNjctMDFiNDU2NWUwMDll"
-)
-
-VAPID_PRIVATE = "dxD4LuZXtbd5QE3iCYYeiwQlUqkzDqhTXJT"
 app = Flask(__name__,template_folder='templates')
 app.config["SECRET_KEY"] = "supersecretkey"
 app.config['SESSION_TYPE'] = 'filesystem'  # You can choose other session storage options
@@ -31,11 +15,6 @@ Session(app)
 # login_manager = LoginManager()
 # login_manager.login_view = 'login'  # Specify the login view
 # login_manager.init_app(app)
-
-with onesignal.ApiClient(configuration) as api_client:
-    # Create an instance of the API class
-    api_instance = default_api.DefaultApi(api_client)    
-
 
 mydb = mysql.connector.connect(
   host="ulsq0qqx999wqz84.chr7pe7iynqr.eu-west-1.rds.amazonaws.com",
