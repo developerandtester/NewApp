@@ -11,7 +11,7 @@ openai.api_key = "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"
 app = Flask(__name__,template_folder='templates')
 app.config["SECRET_KEY"] = "supersecretkey"
 app.config['SESSION_TYPE'] = 'filesystem'  # You can choose other session storage options
-Session(app)
+
 # login_manager = LoginManager()
 # login_manager.login_view = 'login'  # Specify the login view
 # login_manager.init_app(app)
@@ -243,4 +243,4 @@ def ask():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
