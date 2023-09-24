@@ -7,20 +7,20 @@
     <!-- Add this in the <head> section of your HTML -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.3/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
     <script>
-        window.OneSignal = window.OneSignal || [];
-        OneSignal.push(function () {
-            OneSignal.init({
-                 //live
-      appId: "1fa616c6-63ba-4a69-af70-28e92e4da8c4",
-      //locaclhost
-      //appId:"fd8d5be2-d9c8-4c9d-b0ce-7f9a429e9248",
-                notifyButton: {
-                    enable: true,
-                },
-            });
+      window.OneSignalDeferred = window.OneSignalDeferred || [];
+      OneSignalDeferred.push(function(OneSignal) {
+        OneSignal.init({
+          //live 1fa616c6-63ba-4a69-af70-28e92e4da8c4
+          //local 1fa9db79-10f5-4480-ae9a-1d42f7768029
+          appId: "1fa616c6-63ba-4a69-af70-28e92e4da8c4",          
+          notifyButton: {
+            enable: true,
+          },
+          allowLocalhostAsSecureOrigin: true,
         });
+      });
     </script>
 
 </head>
@@ -59,7 +59,6 @@ window.addEventListener('scroll', function() {
   scrollY = window.scrollY;
   floatingButtonContainer.style.top = scrollY + window.innerHeight - 150 + 'px';
 });
-
 
 </script>
 
