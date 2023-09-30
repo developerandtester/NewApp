@@ -29,7 +29,7 @@
         <ul>
             <li><a href="{{ url_for('index') }}">Home</a></li>
             <li><a href="{{ url_for('add_task') }}">Add Task</a></li>       
-            {% if session['is_logged_in'] is true %}
+            {% if session['is_logged_in'] == "True" %}
             <li><a href="/logout">Logout</a></li>
             {%else%}
             <li><a href="/login">Login</a></li>
@@ -43,7 +43,7 @@
     </main>
     
     <footer>
-        &copy; {{ current_year }} Your Reminder App
+        &copy; {{ current_year }} NugdePrompt
     </footer>
 </body>
 <script>

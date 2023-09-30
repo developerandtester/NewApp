@@ -1,33 +1,33 @@
 {% extends 'layout.html' %}
 {% block content %}
 <h1>Sign Up</h1>
-
-  <label for="userFirstName">First Name:</label>
-  <input type="text" id="userFirstName" name="userFirstName">
-
-  <label for="userName">Email (Will be used for future login):</label>
+<form method="post">
+  <label for="userName">First Name:</label>
   <input type="text" id="userName" name="userName">
+
+  <label for="userEmail">Email (Will be used for future login):</label>
+  <input type="text" id="userEmail" name="userEmail">
 
   <label for="userPass">Password:</label>
   <input type="password" id="userPass" name="userPass">
 
-  <button value="SignUp" onclick="validateForm()">SignUp</button>
+  <button value="SignUp" type="submit">SignUp</button>
+</form>
 
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script>
     function isValidEmail(email) {
         // Regular expression for email validation
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;    
         return emailRegex.test(email);
       }
-    function addUser{
+    function validateForm(){
         const userName= document.getElementById('userName').value; 
-        const userFirstName= document.getElementById('userFirstName').value;          
+        const userEmail= document.getElementById('userEmail').value;          
         const userPass= document.getElementById('userPass').value; 
         var u ={
             userName:userName,
-            userFirstName:userFirstName,
+            userEmail:userEmail,
             userPass:userPass         
           }
         if (!isValidEmail(userName)) {
@@ -35,7 +35,7 @@
             return false;
         }
         $.ajax({
-            url: "/addUser",
+            url: "/signup",
             type: "POST",
             data: JSON.stringify(u),
             contentType: "application/json",

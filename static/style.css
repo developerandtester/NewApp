@@ -133,22 +133,22 @@ form {
   .chat-button {
     position: fixed;
     bottom: 20px;
-    right: 20px;
-    background-color: #007BFF;
+    right: 40px;
+    background-color: #252525;
     color: white;
     border: none;
-    border-radius: 50%;
-    width: 60px;
-    height: 60px;
+    border-radius: 10%;
+    width: 90px;
+    height: 40px;
     text-align: center;
-    font-size: 24px;
+    font-size: 30px;
     cursor: pointer;
 }
 
 /* Chat interface style */
 .chat-interface {
     position: fixed;
-    bottom: 20px;
+    bottom: 90px;
     right: 20px;
     width: 300px;
     background-color: white;
