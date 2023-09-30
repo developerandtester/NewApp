@@ -88,7 +88,7 @@ class Reminder:
 
 reminder_app = Reminder()
 scheduler.add_job(reminder_app.check_tasks_status, 'cron', hour=0, minute=0)
-
+scheduler.start()
 
 
 @app.route('/')
@@ -110,7 +110,7 @@ def index():
     # print(user_id)
     # if user_id is not None:
     tasks = get_user_tasks(0)
-    scheduler.start()
+    
     # else:
     #     tasks = []
    

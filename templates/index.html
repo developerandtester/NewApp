@@ -1,6 +1,12 @@
 {% extends 'layout.html' %}
 
 {% block content %}
+<script>   
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    OneSignalDeferred.push(function(OneSignal) {
+        OneSignalDeferred.setExternalUserId({{ session['user_id'] }});
+      });
+</script>
     <section class="container">
         <h1>Welcome to NugdePrompt!</h1>
         <p>Here are your tasks:</p>
