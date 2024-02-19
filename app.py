@@ -9,7 +9,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 
 
 
-openai.api_key = "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"
+openai.api_key = "INSERT KEY HERE"
 app = Flask(__name__,template_folder='templates')
 app.config["SECRET_KEY"] = "supersecretkey"
 app.config['SESSION_TYPE'] = 'filesystem'  # You can choose other session storage options
@@ -21,8 +21,8 @@ scheduler = BackgroundScheduler()
 
 mydb = mysql.connector.connect(
   host="ulsq0qqx999wqz84.chr7pe7iynqr.eu-west-1.rds.amazonaws.com",
-  user="yh1rouqsuxxqdgbs",
-  password="okn19h5k93o3dcqf",
+  user="USER",
+  password="PASS",
   database="nyuufuvltab3cl9m",
   port=3306
 )
